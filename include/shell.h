@@ -10,7 +10,7 @@ class shell{
 
     private: 
         bool running;
-        std::string promot; 
+        std::string prompt; 
         
         std::vector<std::string> parseCommand(const std::string& cmdLine);
         bool executeCommand(const std::vector<std::string>& arfs);
