@@ -129,3 +129,64 @@ bool shell::executeInternalCommand(const std::vector<std::string>& args)
 
     return false;
 }
+
+bool shell::executeExternalCommand(const std::vector<std::string>& args)
+{
+    std::string commandLine;
+
+    for (const auto& arg : args) {
+        if (!commandLine.empty()) {
+            commandLine += " ";
+        }
+
+        if (arg.find(' ') != std::string::npos) {
+            commandLine += "\"" + arg + "\"";
+        } else {
+            commandLine += arg;
+        }
+    }
+
+    if (commandLine.empty()) {
+        return true;
+    }
+
+    STARTUPINFOA si;
+    PROCESS_INFORMATION pi; 
+
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+
+    BOOL success = CreateProcessA(
+        nullptr,
+        commandLine.data(),
+        nullptr,
+        nullptr,
+        FALSE,
+        0,
+        nullptr,
+        nullptr,
+        &si,
+        &pi
+    );
+
+    if (!success) {
+        std::cout << "Fehler: CreateProcess fehlgeschlagen (" << GetLastError() <<")\n";
+        return false;
+    }
+
+    // Auf Prozessende warten
+    WaitForSingleObject(pi.hProcess, INFINITE);
+
+    // Optional Exit-Code holen
+    DWORD exitCode = 0;
+    if (GetExitCodeProcess(pi.hProcess, &exitCode)) {
+        // Debug
+    }
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    return true;
+
+}
