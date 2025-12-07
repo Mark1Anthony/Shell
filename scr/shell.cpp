@@ -31,3 +31,101 @@ void shell::run()
         }
     }
 }
+
+std::vector<std::string> shell::parseCommand(const std::string& cmdLine)
+{
+    std::vector<std::string> args;
+    std::string current;
+
+    bool inQuotes = false;
+
+
+    for (char c : cmdLine) {
+        if (c == '"') {
+            inQuotes = !inQuotes;
+        } else if (c == ' ' && !inQuotes) {
+            if (!current.empty()) {
+                args.push_back(current);
+                current.clear();
+            }
+        } else {
+            current += c;
+        }
+    }
+
+    if (!current.empty()) {
+        args.push_back(current);
+    }
+
+    return args;
+}
+
+bool shell::executeCommand(const std::vector<std::string>& args)
+{
+    if (args.empty()) {
+        return true;
+    }
+
+    //Erst interne Befehle testen
+    if (executeInternalCommand(args)) {
+        return true;
+    }
+
+    //sonst versuche einen externen Befehl
+    return executeExternalCommand(args);
+}
+
+bool shell::executeInternalCommand(const std::vector<std::string>& args)
+{
+    const std::string& cmd = args[0];
+
+
+    // shell beenden
+    if (cmd == "exit") {
+        running = false;
+        return true;
+    }
+
+    // Verzeichnis wechseln / anzeigen 
+    if (cmd == "cd"){
+        if (args.size() < 2) {
+            char buffer [MAX_PATH];
+            if (GetCurrentDirectoryA(MAX_PATH, buffer)) {
+                std::cout << buffer << "\n";
+            } else {
+                std::cout << "Fehler: aktuelles Verzeichnis konnte nicht gelesen werden. \n";
+            }
+        } else {
+            if (!SetCurrentDirectoryA(args[1].c_str())) {
+                std::cout << "Verzeichnis nicht gefunden: " << args[1] << "\n";
+            }
+        }
+        return true;
+    }
+
+    // Text asugabe
+    if (cmd == "echo") {
+        for (size_t i = 1; 1 < args.size(); ++i) {
+            std::cout << args[i]; 
+            if (i + 1 < args.size()) {
+                std::cout << " ";
+            }
+        }
+        std::cout << "\n";
+        return true;
+    }
+    
+    // Hilfe
+    if (cmd == "help") {
+        std::cout << "Interne Befehle:\n";
+        std::cout << "  exit  - Shell beenden\n";
+        std::cout << "  cd    - Verzeichnis anzeigen/wechseln\n";
+        std::cout << "  echo  - Text ausgeben\n";
+        std::cout << "  help  - diese Hilfe\n";
+        std::cout << "\nHinweis: 'dir', 'copy', usw. sind CMD-Befehle,\n";
+        std::cout << "nicht deine Shell. Nutze z.B. 'cmd /C dir'.\n";
+    return true;
+    }
+
+    return false;
+}
