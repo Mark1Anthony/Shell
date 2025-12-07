@@ -13,8 +13,8 @@ class shell{
         std::string prompt; 
         
         std::vector<std::string> parseCommand(const std::string& cmdLine);
-        bool executeCommand(const std::vector<std::string>& arfs);
-        bool executeInternalCommand(const std::vector<std::string>& arfs);
-        bool executeExternalCommand(const std::vector<std::string>& arfs);
+        bool executeCommand(const std::vector<std::string>& args);
+        bool executeInternalCommand(const std::vector<std::string>& args);
+        bool executeExternalCommand(const std::vector<std::string>& args);
 
 };

@@ -2,7 +2,7 @@
 
 int main()
 {
-    shell shell;
-    shell.run();
-    return;
+    shell sh;
+    sh.run();
+    return 0;
 }

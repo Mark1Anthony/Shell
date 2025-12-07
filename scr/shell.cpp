@@ -105,7 +105,7 @@ bool shell::executeInternalCommand(const std::vector<std::string>& args)
 
     // Text asugabe
     if (cmd == "echo") {
-        for (size_t i = 1; 1 < args.size(); ++i) {
+        for (size_t i = 1; i < args.size(); ++i) {
             std::cout << args[i]; 
             if (i + 1 < args.size()) {
                 std::cout << " ";
@@ -159,7 +159,7 @@ bool shell::executeExternalCommand(const std::vector<std::string>& args)
 
     BOOL success = CreateProcessA(
         nullptr,
-        commandLine.data(),
+        &commandLine[0],
         nullptr,
         nullptr,
         FALSE,
